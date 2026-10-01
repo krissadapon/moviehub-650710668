@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import FeaturedCarousel from '../components/FeaturedCarousel';
 import { movies as localMovies } from '../data/data';
-// TODO ขั้นที่ 5: import { useEffect } from 'react' และ import { getMovies } from '../api/tmdb'
+import { getMovies } from '../api/backend';
+
+// TODO ขั้นที่ 5: import { useEffect } from 'react' และ import { getMovies } from '../api/backend'
 
 const STEPS = [
-  { n: 1, file: 'src/api/tmdb.js', what: 'เขียนส่วน fetch ใน getJSON' },
-  { n: 2, file: 'src/api/tmdb.js', what: 'เขียน toMovie แปลง JSON ของ TMDB' },
+  { n: 1, file: 'src/api/backend.js', what: 'เขียนส่วน fetch ใน apiFetch' },
+  { n: 2, file: 'src/api/backend.js', what: 'เขียน toMovie แปลง JSON ของ Backend' },
   { n: 3, file: 'src/pages/Movies.jsx', what: 'useEffect โหลดหนังจาก API (วันละครั้ง) แล้วกรองในเครื่อง' },
   { n: 4, file: 'src/pages/MovieDetail.jsx', what: 'โหลดรายละเอียดตาม id' },
   { n: 5, file: 'src/pages/Home.jsx', what: 'หนังแนะนำสุ่มจากข้อมูล API ชุดเดียวกัน' },
