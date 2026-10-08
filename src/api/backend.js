@@ -33,7 +33,13 @@ export async function apiFetch(path, { method = 'GET', body, token } = {}) {
   }
 
   // 4) อ่าน res.json() ถ้า res.ok ไม่จริง ให้ throw new Error(data.error) และแนบ err.status = res.status ไว้ให้หน้าเว็บตัดสินใจ
-  const data = await res.json();
+  let data;
+  try {
+    data = await res.json();
+  } catch (err) {
+    throw new Error('server ไม่ได้ตอบเป็น JSON');
+  }
+
   if (!res.ok) {
     const err = new Error(data?.error || 'เกิดข้อผิดพลาดในการโหลดข้อมูล');
     err.status = res.status;

@@ -3,10 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import ReviewForm from '../components/ReviewForm';
 import ReviewList from '../components/ReviewList';
 import MovieActions from '../components/MovieActions';
-import { getMovie } from '../api/backend';
+import { getMovie, getReviews, postReview } from '../api/backend';
 import { useAuth } from '../auth/AuthContext';
-import { getReviews, postReview } from '../api/backend';
-// TODO ขั้นที่ 3: import { getReviews, postReview } from '../api/backend';
 
 function MovieDetail() {
   const { id } = useParams();                       // ได้เป็น string เสมอ (ตอนนี้คือรหัสของ TMDB)
@@ -14,8 +12,7 @@ function MovieDetail() {
   const [status, setStatus] = useState('loading');
   const [error, setError] = useState(null);
   const [reviews, setReviews] = useState([]);       // รีวิวจาก backend ของเรา (ไม่ใช่ TMDB)
-  const { isLoggedIn } = useAuth();         
-  const { token, member } = useAuth();         // TODO ขั้นที่ 3: ดึง token และ member มาด้วย
+  const { isLoggedIn, token } = useAuth();
 
   useEffect(() => {
     let ignore = false;
@@ -30,26 +27,20 @@ function MovieDetail() {
     }
     load();
     return () => { ignore = true; };
-  }, [id]);                                          // id เปลี่ยน = โหลดเรื่องใหม่
+  }, [id]);                                         // id เปลี่ยน = โหลดเรื่องใหม่
 
-  // TODO ขั้นที่ 3 (ก): เปลี่ยน effect นี้ให้โหลดรีวิวจริงจาก backend
-  //   getReviews(id) ได้ { items } แล้ว setReviews(items)  dependency คือ [id] เหมือนตัวบน
-  //   (แยกจาก effect ของ TMDB เพราะคนละ server พังคนละแบบ ไม่ควรให้รีวิวล่มแล้วหน้าทั้งหน้าพัง)
-
- useEffect(() => {
+  useEffect(() => {
     let ignore = false;
     getReviews(id)
-      .then(data => { if (!ignore) setReviews(data.items); })
+      .then(data => { if (!ignore) setReviews(data?.items || []); })
       .catch(() => { if (!ignore) setReviews([]); });   // backend ล่มก็แค่ไม่มีรีวิว หน้าหนังยังดูได้
     return () => { ignore = true; };
   }, [id]);
 
-   async function handleReviewSubmit(text) {
-    const saved = await postReview(id, text, token);          // 201 ได้ { id, text, createdAt }
-    setReviews([
-      { ...saved, member: { id: member.id, displayName: member.displayName }, score: null },
-      ...reviews,                                              // ต่อหน้ารายการเดิม
-    ]);
+  async function handleReviewSubmit(text) {
+    await postReview(id, text, token);
+    const data = await getReviews(id);
+    setReviews(data?.items || []);
   }
 
   if (status === 'loading') {
@@ -97,7 +88,7 @@ function MovieDetail() {
           </p>
           <p className="mt-4 leading-relaxed text-slate-700">{movie.detail}</p>
 
-          <MovieActions movieId={movie.id} />
+          <MovieActions movieId={id} />
 
           <div className="mt-8">
             <h2 className="mb-3 text-lg font-semibold text-slate-900">รีวิวจากสมาชิก ({reviews.length})</h2>
@@ -106,7 +97,7 @@ function MovieDetail() {
 
           <div className="mt-6 rounded-xl border border-emerald-100 bg-white p-5">
             {isLoggedIn ? (
-              <ReviewForm key={movie.id} movieTitle={movie.title} onSubmit={handleReviewSubmit} />
+              <ReviewForm key={id} movieTitle={movie.title} onSubmit={handleReviewSubmit} />
             ) : (
               <p className="text-sm text-slate-500">
                 <Link to="/login" className="text-emerald-600 hover:underline">เข้าสู่ระบบ</Link> เพื่อเขียนรีวิว
