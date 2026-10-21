@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '../auth/AuthContext';
 import ProtectedRoute from './ProtectedRoute';
+import '@testing-library/jest-dom';
 
 // หน้าปลอม 2 หน้า พอให้รู้ว่าตอนนี้อยู่หน้าไหน
 function Secret() { return <h1>หน้าลับ</h1>; }

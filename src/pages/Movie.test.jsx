@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import Movies from './Movies';
 import { getMovies } from '../api/backend';
+import '@testing-library/jest-dom';
 
 // แทนทั้งไฟล์ backend.js ด้วยของปลอม: ทุกฟังก์ชันกลายเป็น jest.fn() ที่เรากำหนดคำตอบได้
 jest.mock('../api/backend');
